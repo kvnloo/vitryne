@@ -151,6 +151,33 @@ try {
     result: { color: "navy", kind: "Cotton jersey" },
   });
 
+  // A second bridge on the same port (another Hermes session) forwards to the first.
+  const second = spawn(
+    process.execPath,
+    [
+      new URL("./hermes-bridge.mjs", import.meta.url).pathname,
+      "--port",
+      String(PORT),
+    ],
+    { stdio: ["pipe", "pipe", "pipe"] },
+  );
+  const secondReply = new Promise((resolve) => {
+    let buf = "";
+    second.stdout.on("data", (d) => {
+      buf += d;
+      if (buf.includes("\n"))
+        resolve(JSON.parse(buf.slice(0, buf.indexOf("\n"))));
+    });
+  });
+  await sleep(300);
+  second.stdin.write(
+    `${JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "set_fabric_color", arguments: { color: "red" } } })}\n`,
+  );
+  const forwarded = await secondReply;
+  second.kill();
+  assert.equal(forwarded.result.isError, false);
+  assert.equal(editor.design.color, "red");
+
   const unknown = await rpc("tools/call", { name: "explode", arguments: {} });
   assert.equal(unknown.result.isError, true);
   editor.close();

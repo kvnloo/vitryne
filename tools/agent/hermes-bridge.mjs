@@ -54,7 +54,22 @@ function allowedOrigin(origin) {
   return origin === "https://vitryne.app" || EXTRA_ORIGINS.includes(origin);
 }
 
-function callPage(tool, args) {
+/** Another bridge already holds the port (a second Hermes session): calls go through it. */
+let forward = false;
+
+async function callPage(tool, args) {
+  if (forward) {
+    try {
+      const res = await fetch(`http://127.0.0.1:${PORT}/agent/call`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ tool, args }),
+      });
+      return await res.json();
+    } catch (e) {
+      return { ok: false, error: `the bridge on port ${PORT} is gone: ${e}` };
+    }
+  }
   const page = pages.at(-1);
   if (!page)
     return Promise.resolve({
@@ -174,6 +189,11 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+server.on("error", (e) => {
+  if (e.code !== "EADDRINUSE") throw e;
+  forward = true;
+  log(`port ${PORT} is taken by another bridge: forwarding calls to it`);
+});
 server.listen(PORT, "127.0.0.1", () =>
   log(
     `listening on http://127.0.0.1:${PORT}; open the editor with ?agent=${PORT}`,
