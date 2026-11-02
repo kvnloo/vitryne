@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Fork only (kvnloo/vitryne): builds the editor bundle (wasm, assets, vite) and uploads it, so it
+# can be served and tried on a machine without the Rust toolchain.
+name: preview-dist
+on:
+  workflow_dispatch:
+  push:
+    branches: [fork/preview]
+permissions:
+  contents: read
+jobs:
+  dist:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - run: make build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vitryne-web-dist
+          path: packages/vitryne-web/dist
+          retention-days: 14
