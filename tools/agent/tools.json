@@ -1,0 +1,175 @@
+[
+  {
+    "name": "describe_design",
+    "description": "What is open: the garment, its pieces with their fabric and colour, the fabrics, the undo/redo labels, and the fabric kinds and colour swatches the other tools accept. Call first.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "set_fabric_kind",
+    "description": "Make a fabric hang like another kind of cloth (jersey, denim, poplin, fleece, wool suiting). The 3D garment re-drapes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "e.g. denim, fleece, jersey"
+        },
+        "fabric": {
+          "type": "string",
+          "description": "Fabric id or name (as describe_design lists them); leave out for the garment's main fabric"
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    }
+  },
+  {
+    "name": "set_fabric_color",
+    "description": "Recolour a fabric (every piece cut from it). Accepts #rrggbb or a swatch name like navy or heather grey.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "#rrggbb or a swatch name"
+        },
+        "fabric": {
+          "type": "string",
+          "description": "Fabric id or name (as describe_design lists them); leave out for the garment's main fabric"
+        }
+      },
+      "required": [
+        "color"
+      ]
+    }
+  },
+  {
+    "name": "tune_fabric",
+    "description": "Change one physical value of a fabric, either to a value or by a factor (factor 2 = twice as stiff/stretchy-resistant/heavy). Fields: density, thickness, friction, stretchWarp, stretchWeft, stretchShear, bendingWarp, bendingWeft. Density is kg/m², bending is stiffness, stretch is resistance to stretching.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": [
+            "density",
+            "thickness",
+            "friction",
+            "stretchWarp",
+            "stretchWeft",
+            "stretchShear",
+            "bendingWarp",
+            "bendingWeft"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "factor": {
+          "type": "number",
+          "description": "multiply the current value"
+        },
+        "fabric": {
+          "type": "string",
+          "description": "Fabric id or name (as describe_design lists them); leave out for the garment's main fabric"
+        }
+      },
+      "required": [
+        "field"
+      ]
+    }
+  },
+  {
+    "name": "add_fabric",
+    "description": "Add a new fabric of a kind and colour (for a contrast piece). Nothing uses it until use_fabric_for_piece or set_garment_fabric.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "description": "optional; default from colour and kind"
+        }
+      },
+      "required": [
+        "kind",
+        "color"
+      ]
+    }
+  },
+  {
+    "name": "use_fabric_for_piece",
+    "description": "Cut a piece (every copy of it, e.g. both sleeves) from a fabric. Leave fabric out to go back to the garment's main fabric.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "piece": {
+          "type": "string",
+          "description": "piece name, e.g. sleeve"
+        },
+        "fabric": {
+          "type": "string",
+          "description": "fabric id or name"
+        }
+      },
+      "required": [
+        "piece"
+      ]
+    }
+  },
+  {
+    "name": "set_garment_fabric",
+    "description": "Make a fabric the garment's main one (every piece without its own fabric).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "fabric": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "fabric"
+      ]
+    }
+  },
+  {
+    "name": "rename_project",
+    "description": "Rename the project.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "undo",
+    "description": "Undo the last edit (the person's or the assistant's), as the Undo button does.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "redo",
+    "description": "Redo the last undone edit.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  }
+]

@@ -30,7 +30,7 @@ STEP := printf '\n== %s\n'
 .DEFAULT_GOAL := help
 .PHONY: help setup dev dev-app docs-dev docs wasm assets build hygiene fmt fmt-check lint test syntax examples drafting-corpus \
 	examples-check regress regress-update check-quick check-ci check cloud-test stack stack-down stack-test clean \
-	deps cli fmt-check-rust fmt-check-web fmt-check-docs lint-rust lint-web test-rust test-web
+	deps cli fmt-check-rust fmt-check-web fmt-check-docs lint-rust lint-web test-rust test-web agent-bridge
 
 help: ## Lists the targets
 	awk 'BEGIN { FS = ":.*## " } /^[a-z-]+:.*## / { printf "  make %-16s %s\n", $$1, $$2 }' \
@@ -130,6 +130,10 @@ syntax: ## node --check / bash -n on the tools', cloud's and web's scripts
 	git ls-files -z '$(CLOUD)/deploy/*.sh' | xargs -0 -n 1 bash -n
 	echo ok
 
+agent-bridge: ## The assistant bridge (tools/agent) against a stand-in editor, over MCP and HTTP
+	$(STEP) 'agent bridge'
+	node tools/agent/bridge.test.mjs
+
 drafting-corpus: ## Import Valentina's and Seamly2D's own pattern collections (fetched into target/): pieces made and refused
 	tools/drafting/corpus.sh
 
@@ -155,7 +159,7 @@ check-quick: hygiene fmt-check-rust lint-rust test-rust ## Rust only: hygiene, r
 	printf '\ncheck: quick checks passed (web build and drapes skipped)\n'
 
 CHECK_NO_GPU := hygiene fmt-check-rust lint-rust test-rust build fmt-check-web test-web syntax \
-	examples-check fmt-check-docs docs
+	agent-bridge examples-check fmt-check-docs docs
 check-ci: $(CHECK_NO_GPU) ## Everything but the drapes (no GPU): what CI runs on every pull request
 	printf '\ncheck: all passed but the drapes (make regress needs a GPU)\n'
 
