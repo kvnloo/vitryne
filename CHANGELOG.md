@@ -8,6 +8,14 @@ release renames that section ([Maintaining](packages/vitryne-docs/content/docs/d
 
 ## [Unreleased]
 
+### Added
+
+- An assistant can edit the open design: run `node tools/agent/hermes-bridge.mjs` and open the
+  editor with `?agent=7341`, then Hermes or any MCP client can read the design, change a fabric's
+  kind, colour or values, give pieces a contrast fabric, rename the project and undo. Each of its
+  edits is one undo step labelled "(assistant)", and a pill shows what it last did. It never sews
+  or places pieces. The bridge listens on 127.0.0.1 only and is off unless the URL asks for it.
+
 ## [0.6.0] - 2026-11-01
 
 ### Changed

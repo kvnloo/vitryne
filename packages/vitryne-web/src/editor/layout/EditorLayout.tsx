@@ -47,6 +47,7 @@ import { useSewing } from "../hooks/useSewing";
 import { useShortcuts } from "../hooks/useShortcuts";
 import { useSplitView } from "../hooks/useSplitView";
 import { useStarted } from "../hooks/useStarted";
+import { useAgentBridge } from "../hooks/useAgentBridge";
 import { useThumbnails } from "../hooks/useThumbnails";
 import { useWarningsLog } from "../hooks/useWarningsLog";
 import { StartPage } from "../start/StartPage";
@@ -54,6 +55,7 @@ import { DrapeView } from "./DrapeView";
 import { FlatView } from "./FlatView";
 import { useBodyPick } from "../hooks/useBodyPick";
 import { NoticeCards } from "./NoticeCards";
+import { AgentPill } from "./AgentPill";
 import { Rail } from "./Rail";
 import { RecoveryBanner } from "./RecoveryBanner";
 import { SidePanel } from "./SidePanel";
@@ -68,6 +70,7 @@ export function EditorLayout({ cloud }: { cloud: Cloud }) {
   const store = useMemo(() => new DocumentStore(session), [session]);
   const disk = useMemo(() => new DiskFiles(), []);
   const doc = useDocument(store);
+  const agent = useAgentBridge(store);
   const files = useFiles(session, store, disk, doc, cloud);
   useDrapeMemory(session, store, doc, engine);
   const ready = useStarted(files.started);
@@ -309,6 +312,7 @@ export function EditorLayout({ cloud }: { cloud: Cloud }) {
         onAccount={openAccount}
         onExport={exportIt}
       />
+      <AgentPill status={agent} />
 
       <div className="relative flex min-h-0 grow">
         <Rail panel={panels.panel} setPanel={panels.setPanel} />
